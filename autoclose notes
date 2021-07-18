@@ -1,0 +1,14 @@
+(do not have a user prompt this program should run the background)
+
+open file with picture of top bar
+
+have to check to see if league of legends client is open 
+    check by taking screen shots and comparing to picture of topbar
+    should probably do this every few seconds not every frame 
+    compare picture of top bar with screenshots of computer
+
+if league client is open need to find the X and click on it
+    (how do i orient the click relative to where the top bar is so i can click on x)
+then find the exit button (the are you sure button) and click on it
+    (same problem with the x but harder)
+    take the coordinates of the x button and add by a set ammount since dimensions are always the same

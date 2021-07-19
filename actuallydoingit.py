@@ -8,81 +8,65 @@ from urllib import request
 src = mss.mss()
 pyautogui.PAUSE = 0
 
+threshhold =.98 
+
+#get picture from link to github
+def urlPic(url):
+    req = request.urlopen(url)
+    arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+    return cv2.imdecode(arr, 1)
 
 
-req = request.urlopen('https://raw.githubusercontent.com/gogogo221/leaguecloser/main/topbar.png')
-arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
-topBar = cv2.imdecode(arr, 1)
-
-
-w = topBar.shape[1] #set the width and the height of the topbar 
-h = topBar.shape[0]
-
-
-req2 = request.urlopen('https://raw.githubusercontent.com/gogogo221/leaguecloser/main/exit.png')
-arr2 = np.asarray(bytearray(req2.read()), dtype=np.uint8)
-ofCourse = cv2.imdecode(arr2, 1)
-
+#get picture of the X button and the EXIT button
+topBar = urlPic('https://raw.githubusercontent.com/gogogo221/leaguecloser/main/topbar.png')
+ofCourse = urlPic('https://raw.githubusercontent.com/gogogo221/leaguecloser/main/exit.png')
 
 
 
+#width and height added to coordinates to matching template to click
 clkw = 103
 clkh = 14
-
 ofcw = 50
 ofch = 25
 
 
-
+#repeat
 while True:
+    #take and save a screenshot
     screen = cv2.imread(src.shot(), 1)
 
+    #compare the X template to the screenshot to find any matches
     result = cv2.matchTemplate(screen, topBar, cv2.TM_CCOEFF_NORMED)
-    threshhold =.98 #set the threshhold = to a number then if maxVal is greater than threshhold then make coordinates for each match  
+
+    #if match is greater than threshhold then make coordinates for the x and y location of the match
+
     yloc, xloc = np.where(result >= threshhold)
 
     if len(xloc) > 0:
     
-        rectangles = []
-        for (x, y) in zip(xloc, yloc):
-            rectangles.append([int(x), int(y), int(w), int(h)])
-            rectangles.append([int(x), int(y), int(w), int(h)])
-
-        rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
-        target = rectangles[0]
-
-
-        clkX = target[0] + clkw
-        clkY = target[1] + clkh
-    
+        #make coordinates for where to click then click
+        clkX = xloc + clkw
+        clkY = yloc + clkh
         pyautogui.moveTo(clkX, clkY)
         pyautogui.click() 
 
 
         time.sleep(0.2)
 
+
         screen = cv2.imread(src.shot())
         result = cv2.matchTemplate(screen, ofCourse, cv2.TM_CCOEFF_NORMED)
 
-        threshhold =.95 #set the threshhold = to a number then if maxVal is greater than threshhold then make coordinates for each match  
+
         yloc, xloc = np.where(result >= threshhold)
 
         if len(xloc) > 0:
             
-            rectangles = []
-            for (x, y) in zip(xloc, yloc):
-                rectangles.append([int(x), int(y), int(w), int(h)])
-                rectangles.append([int(x), int(y), int(w), int(h)])
-
-            rectangles, weights = cv2.groupRectangles(rectangles, 1, 0.2)
-            target = rectangles[0]
-
-
-            clkX = target[0] + ofcw
-            clkY = target[1] + ofch
-        
+            clkX = xloc + ofcw
+            clkY = yloc + ofch
             pyautogui.moveTo(clkX, clkY)
             pyautogui.click()   
+
     time.sleep(0.1)
 
     if keyboard.is_pressed('esc'):
